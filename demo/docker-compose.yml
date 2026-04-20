@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  api:
+    build: .
+    command: uvicorn api.v1.app:app --host 0.0.0.0 --port 8000
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - WORKSPACE_ROOT=/opt-workspace
+      - QUANTAGONIA_API_KEY=${QUANTAGONIA_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+    volumes:
+      - workspace:/opt-workspace
+    ports: ["8000:8000"]
+    depends_on:
+      - redis
+
+  worker:
+    build: .
+    command: celery -A api.v1.workers worker -Q optimization --loglevel=info
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - WORKSPACE_ROOT=/opt-workspace
+      - QUANTAGONIA_API_KEY=${QUANTAGONIA_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - workspace:/opt-workspace
+    depends_on:
+      - redis
+
+  dashboard:
+    build: .
+    command: streamlit run dashboard/app.py --server.port 8501
+    environment:
+      - WORKSPACE_ROOT=/opt-workspace
+    volumes:
+      - workspace:/opt-workspace
+    ports: ["8501:8501"]
+
+volumes:
+  workspace:

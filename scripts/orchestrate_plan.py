@@ -4,6 +4,9 @@ import json
 import asyncio
 import subprocess
 from datetime import datetime
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from schemas_v2 import DecompositionPlan, PlanExecutionReport, StageResult
 
 async def run_stage(stage, plan, plan_dir, env):
@@ -70,11 +73,38 @@ async def run_stage(stage, plan, plan_dir, env):
         billed_minutes=sub.get("billed_minutes", 0) or 0
     )
     
-    # Check if needs reformulation (mock logic integration)
+    # Reformulation loop: up to 3 attempts on failure
     if status == "timeout" or (result.rel_gap is not None and result.rel_gap > 0.05):
-        # We would run reformulate.py here
-        # For blueprint, we just log it
-        print(json.dumps({"event": "reformulation_triggered", "stage_id": stage.stage_id}))
+        failure_reason = "timeout" if status == "timeout" else "poor_gap"
+        for attempt in range(1, 4):
+            print(json.dumps({"event": "reformulation_triggered", "stage_id": stage.stage_id, "attempt": attempt}))
+            sys.stdout.flush()
+            ref_proc = await asyncio.create_subprocess_exec(
+                'python3', 'scripts/reformulate.py', stage_dir,
+                '--attempt', str(attempt), '--failure-reason', failure_reason,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
+            )
+            await ref_proc.communicate()
+            if ref_proc.returncode != 0:
+                break
+            # Resubmit after reformulation
+            re_proc = await asyncio.create_subprocess_exec(
+                'python3', 'scripts/submit_hybridsolver.py', stage_dir, '--time-limit', str(time_limit * (attempt + 1)),
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
+            )
+            await re_proc.communicate()
+            if os.path.exists(sub_path):
+                with open(sub_path, 'r') as f:
+                    sub = json.load(f)
+                if sub.get("status") in ["FINISHED", "SUCCESS", "success"]:
+                    result.status = "reformulated"
+                    result.objective = sub.get("objective")
+                    result.bound = sub.get("bound")
+                    result.rel_gap = sub.get("rel_gap")
+                    result.wall_time = sub.get("wall_time", 0.0)
+                    result.billed_minutes += sub.get("billed_minutes", 0) or 0
+                    result.reformulation_attempts = attempt
+                    break
         
     print(json.dumps({
         "event": "stage_completed", 

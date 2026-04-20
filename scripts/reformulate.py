@@ -3,6 +3,9 @@ import sys
 import json
 import argparse
 from datetime import datetime
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from schemas_v2 import ReformulationAction
 
 def reformulate(stage_dir: str, attempt: int, failure_reason: str):

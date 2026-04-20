@@ -18,12 +18,16 @@ def carry_forward(completed_stage_dir: str, next_stage_dir: str, variables: str)
     var_list = [v.strip() for v in variables.split(',')]
     carried = {}
     
+    missing = []
     for v in var_list:
         if v in solution:
             carried[v] = solution[v]
         else:
-            # Fake solution extraction for demo purposes if not strictly populated
-            carried[v] = 0.0
+            missing.append(v)
+
+    if missing:
+        print(f"Missing solution values for carry-forward variables: {missing}", file=sys.stderr)
+        sys.exit(1)
             
     with open(os.path.join(next_stage_dir, 'carry_forward_input.json'), 'w') as f:
         json.dump(carried, f, indent=2)

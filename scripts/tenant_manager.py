@@ -3,6 +3,9 @@ import sys
 import json
 import argparse
 from datetime import datetime
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from schemas_v3 import TenantConfig
 
 def get_registry_path(workspace_root: str) -> str:

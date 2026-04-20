@@ -4,6 +4,9 @@ import json
 import shutil
 import argparse
 from datetime import datetime
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 

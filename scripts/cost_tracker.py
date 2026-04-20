@@ -66,8 +66,9 @@ def check_budget(workspace_root: str, tenant_id: str):
     db = get_db(workspace_root)
     current_month = datetime.utcnow().strftime('%Y-%m')
     
-    # Calculate sum
-    rows = list(db.query(f"SELECT SUM(billed_minutes) as total FROM cost_records WHERE tenant_id = ? AND submitted_at LIKE '{current_month}%'", [tenant_id]))
+    # Calculate sum (parameterized to prevent SQL injection)
+    month_prefix = current_month + "%"
+    rows = list(db.query("SELECT SUM(billed_minutes) as total FROM cost_records WHERE tenant_id = ? AND submitted_at LIKE ?", [tenant_id, month_prefix]))
     used = rows[0]['total'] or 0
     
     if used >= budget:

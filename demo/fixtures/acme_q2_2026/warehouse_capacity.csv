@@ -1,6 +1,6 @@
-warehouse,capacity_tons
-W1,5000
-W2,8000
-W3,12000
-W4,3000
-W5,6000
+warehouse,capacity,unit
+W1,5000,tons
+W2,8000,tons
+W3,12000000,kg
+W4,3000,tons
+W5,6000,tons

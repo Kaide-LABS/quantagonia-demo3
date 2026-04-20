@@ -32,7 +32,8 @@ def process_request(self, request_id: str, tenant_id: str):
     r = redis.Redis.from_url(celery_app.conf.broker_url)
     
     def report_progress(status: str):
-        r.publish(f"job:{request_id}", '{{"type": "status_change", "status": "' + status + '"}')
+        import json as _json
+        r.publish(f"job:{request_id}", _json.dumps({"type": "status_change", "status": status}))
         
     report_progress("processing")
     

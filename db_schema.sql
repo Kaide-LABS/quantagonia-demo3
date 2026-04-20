@@ -1,3 +1,13 @@
+-- Tenants (must be created first — referenced by users and other tables)
+CREATE TABLE tenants (
+    id TEXT PRIMARY KEY,
+    display_name TEXT NOT NULL,
+    stripe_subscription_id TEXT,
+    plan_id TEXT DEFAULT 'starter',
+    active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Users (synced from Clerk webhooks)
 CREATE TABLE users (
     id TEXT PRIMARY KEY,            -- Clerk user ID
@@ -6,16 +16,6 @@ CREATE TABLE users (
     tenant_id TEXT REFERENCES tenants(id),
     role TEXT NOT NULL DEFAULT 'viewer',
     stripe_customer_id TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Tenants
-CREATE TABLE tenants (
-    id TEXT PRIMARY KEY,
-    display_name TEXT NOT NULL,
-    stripe_subscription_id TEXT,
-    plan_id TEXT DEFAULT 'starter',
-    active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

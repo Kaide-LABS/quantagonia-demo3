@@ -81,6 +81,42 @@ def notify(action: str, run_dir: str, channel: str = None, thread_ts: str = None
         blocks = [
             {"type": "section", "text": {"type": "mrkdwn", "text": f"⚠️ *Error encountered in pipeline*"}}
         ]
+    # Phase 2 additions
+    elif action == "plan_detected":
+        text = "Detected multi-stage optimization"
+        blocks = [
+            {"type": "section", "text": {"type": "mrkdwn", "text": f"Detected multi-stage optimization. Reply APPROVE to execute."}}
+        ]
+    elif action == "stage_started":
+        text = "Starting stage"
+        blocks = [
+            {"type": "section", "text": {"type": "mrkdwn", "text": f"Starting stage..."}}
+        ]
+    elif action == "stage_complete":
+        text = "Stage complete"
+        blocks = [
+            {"type": "section", "text": {"type": "mrkdwn", "text": f"Stage complete. Objective/gap updated."}}
+        ]
+    elif action == "qubo_result":
+        text = "QUBO comparison"
+        blocks = [
+            {"type": "section", "text": {"type": "mrkdwn", "text": f"QUBO comparison complete."}}
+        ]
+    elif action == "reformulating":
+        text = "Reformulating stage"
+        blocks = [
+            {"type": "section", "text": {"type": "mrkdwn", "text": f"Stage failed, attempting reformulation."}}
+        ]
+    elif action == "plan_complete":
+        text = "Plan complete"
+        blocks = [
+            {"type": "section", "text": {"type": "mrkdwn", "text": f"Plan complete."}}
+        ]
+    elif action == "memory_learned":
+        text = "Memory learned"
+        blocks = [
+            {"type": "section", "text": {"type": "mrkdwn", "text": f"Learned facts."}}
+        ]
     else:
         blocks = [{"type": "section", "text": {"type": "mrkdwn", "text": f"Unknown action: {action}"}}]
 
@@ -98,7 +134,7 @@ def notify(action: str, run_dir: str, channel: str = None, thread_ts: str = None
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=["intake", "preview", "validation", "artifacts", "submitted", "progress", "completed", "error"])
+    parser.add_argument("action", choices=["intake", "preview", "validation", "artifacts", "submitted", "progress", "completed", "error", "plan_detected", "stage_started", "stage_complete", "qubo_result", "reformulating", "plan_complete", "memory_learned"])
     parser.add_argument("run_dir")
     parser.add_argument("--channel")
     parser.add_argument("--thread-ts")

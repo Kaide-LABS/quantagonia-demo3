@@ -56,3 +56,24 @@ metadata:
 17. Stream progress events to Slack thread
 18. On completion: post final summary
 19. Write MEMORY.md entry with any learned terminology/conventions
+
+### Phase F: Multi-Stage Plan Detection
+20. After single-request extraction, check if data contains temporal decomposition signals
+21. IF quarterly/temporal data detected:
+    - Run: `exec python3 scripts/plan_generator.py <staging_dir> --account <acct> --strategy quarterly`
+    - Post to Slack: "Detected multi-stage optimization (4 quarters). Generating decomposition plan."
+    - Await APPROVE for plan execution
+
+### Phase G: Sequential Execution
+22. Run: `exec python3 scripts/orchestrate_plan.py <plan_dir>`
+23. Monitor stdout for stage completion events
+24. Post per-stage progress to Slack thread
+25. IF any stage fails and reformulation exhausted:
+    - Post failure details to Slack
+    - HALT (await human guidance)
+26. On plan completion: post final summary with total cost/time
+
+### Phase H: Institutional Memory
+27. Run: `exec python3 scripts/memory_writer.py plan_complete <plan_dir>`
+28. IF QUBO comparison available: `exec python3 scripts/memory_writer.py qubo_comparison <stage_dir>`
+29. Post memory update confirmation to Slack: "Learned {N} new facts about {account}'s problem structure."

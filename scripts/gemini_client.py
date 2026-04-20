@@ -1,6 +1,9 @@
 import os
 import sys
 import json
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from pydantic import BaseModel
 from typing import List, Literal, Optional
 
@@ -91,3 +94,49 @@ def repair_bundle(bundle_json: str, validation_errors: List[dict]) -> Constraint
         )
     )
     return ConstraintBundle.model_validate_json(response.text)
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", choices=["classify", "extract", "repair"])
+    parser.add_argument("run_dir")
+    args = parser.parse_args()
+
+    if args.action == "classify":
+        staging_dir = args.run_dir
+        files = []
+        for f in os.listdir(staging_dir):
+            fp = os.path.join(staging_dir, f)
+            if os.path.isfile(fp):
+                files.append({"name": f, "size_bytes": os.path.getsize(fp), "extension": os.path.splitext(f)[1]})
+        result = classify_files(files)
+        print(result.model_dump_json(indent=2))
+
+    elif args.action == "extract":
+        parsed_path = os.path.join(args.run_dir, "parsed_docs.json")
+        with open(parsed_path, 'r') as f:
+            docs_raw = json.load(f)
+        parsed_docs = [ParsedDocument(**d) for d in docs_raw]
+        memory_path = os.path.join(os.path.dirname(args.run_dir), '..', '..', 'MEMORY.md')
+        prior_context = None
+        if os.path.exists(memory_path):
+            with open(memory_path, 'r') as f:
+                prior_context = f.read()
+        bundle = extract_constraints(parsed_docs, prior_context)
+        bundle_path = os.path.join(args.run_dir, "constraint_bundle.json")
+        with open(bundle_path, 'w') as f:
+            f.write(bundle.model_dump_json(indent=2))
+        print(json.dumps({"status": "extracted", "variables": len(bundle.variables), "constraints": len(bundle.constraints)}))
+
+    elif args.action == "repair":
+        bundle_path = os.path.join(args.run_dir, "constraint_bundle.json")
+        report_path = os.path.join(args.run_dir, "validation_report.json")
+        with open(bundle_path, 'r') as f:
+            bundle_json = f.read()
+        with open(report_path, 'r') as f:
+            report = json.load(f)
+        repaired = repair_bundle(bundle_json, report.get("errors", []))
+        with open(bundle_path, 'w') as f:
+            f.write(repaired.model_dump_json(indent=2))
+        print(json.dumps({"status": "repaired", "variables": len(repaired.variables), "constraints": len(repaired.constraints)}))

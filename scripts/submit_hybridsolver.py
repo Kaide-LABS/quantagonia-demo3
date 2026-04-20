@@ -7,10 +7,14 @@ from datetime import datetime
 
 try:
     from quantagonia import HybridSolver, HybridSolverParameters
-    from quantagonia.enums import JobStatus
+    from quantagonia.cloud.enums import JobStatus
 except ImportError:
-    print("quantagonia package not installed.", file=sys.stderr)
-    sys.exit(1)
+    try:
+        from quantagonia import HybridSolver, HybridSolverParameters
+        from quantagonia.enums import JobStatus
+    except ImportError:
+        print("quantagonia package not installed.", file=sys.stderr)
+        sys.exit(1)
 
 def submit_job(run_dir: str, time_limit: int, rel_gap: float, as_qubo: bool):
     api_key = os.environ.get("QUANTAGONIA_API_KEY")

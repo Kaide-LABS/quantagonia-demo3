@@ -3,7 +3,9 @@ import sys
 import json
 import argparse
 from datetime import datetime
-import subprocess
+import gzip as gzip_mod
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from pulp import LpProblem, LpMinimize, LpMaximize, LpVariable, LpContinuous, LpInteger, LpBinary, lpSum
 from schemas import ConstraintBundle, VariableType
@@ -60,7 +62,8 @@ def emit_artifacts(run_dir: str, do_lp: bool, do_qubo: bool):
         prob.writeLP(lp_path)
         
     mps_gz_path = mps_path + '.gz'
-    subprocess.run(['gzip', '-c', mps_path], stdout=open(mps_gz_path, 'wb'))
+    with open(mps_path, 'rb') as f_in, gzip_mod.open(mps_gz_path, 'wb') as f_out:
+        f_out.writelines(f_in)
     
     if do_qubo:
         if not all_binary:

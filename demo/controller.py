@@ -3,11 +3,18 @@ import sys
 import time
 import shutil
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone
 import subprocess
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
+def _now():
+    return datetime.now(timezone.utc)
+
 def print_beat(msg: str):
-    print(f"\n[{datetime.utcnow().strftime('%H:%M:%S')}] {msg}")
+    print(f"\n[{_now().strftime('%H:%M:%S')}] {msg}")
 
 def print_narration(msg: str):
     print("\n" + "━"*54)
@@ -31,7 +38,7 @@ def run_demo(mode: str, fixture: str, speed: float):
     memory_file = os.path.join(tenant_dir, "MEMORY.md")
     os.makedirs(os.path.dirname(memory_file), exist_ok=True)
     with open(memory_file, 'w') as f:
-        f.write(f"## Tenant: ACME Corp (Demo)\nCreated: {datetime.utcnow().isoformat()}\n")
+        f.write(f"## Tenant: ACME Corp (Demo)\nCreated: {_now().isoformat()}\n")
         
     db_file = os.path.join(workspace, "cost_tracker.db")
     if os.path.exists(db_file):

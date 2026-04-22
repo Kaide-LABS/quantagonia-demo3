@@ -1,1 +1,22 @@
-Q2 workforce allocation for Munich. Max 8h shifts, no weekend OT. Prioritize warehouse-3.
+From: planner@acme.com
+Subject: Q2 2026 distribution plan — Munich, Berlin, Hamburg
+
+Team,
+
+Please run the Q2 2026 distribution optimization for our Germany DC network.
+Objective: minimize total routing cost in EUR across SKU-001/002/003 shipped from
+warehouses W1 (Hamburg), W2 (Berlin), W3 (Munich) to destinations D1 (Paris),
+D2 (Vienna), D3 (Amsterdam).
+
+Constraints:
+  - Monthly warehouse capacities per the attached capacity CSV.
+  - Monthly SKU demand per the attached XLSX (tabs Apr / May / Jun; Summary is informational).
+  - Munich labour rules per the attached IG Metall collective agreement. In particular:
+      * 8h shift cap (§2), weekend overtime prohibited except documented Notfall (§5).
+      * Prefer Munich (W3) for SKU-001 where routing cost is competitive.
+  - All demand must be fully satisfied (no backorders).
+
+Deliverable: optimal shipment plan by warehouse × destination × SKU × month,
+plus total cost and per-warehouse utilization.
+
+— Planner

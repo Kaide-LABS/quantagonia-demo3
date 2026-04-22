@@ -1,6 +1,4 @@
-warehouse,capacity,unit
-W1,5000,tons
-W2,8000,tons
-W3,12000000,kg
-W4,3000,tons
-W5,6000,tons
+warehouse_id,city,monthly_capacity,unit
+W1,Hamburg,450,tons
+W2,Berlin,380,tons
+W3,Munich,520000,kg

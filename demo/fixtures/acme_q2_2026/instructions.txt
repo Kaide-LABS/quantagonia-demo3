@@ -1,22 +1,76 @@
-From: planner@acme.com
-Subject: Q2 2026 distribution plan — Munich, Berlin, Hamburg
+From:       Stefan Krüger <s.krueger@acme-logistics.de>
+To:         Planning Team <planning-ops@acme-logistics.de>
+CC:         Works Council <br-muc@acme-logistics.de>; Isabelle Weber <i.weber@acme-logistics.de>
+Sent:       Monday, 20 April 2026 08:14 CEST
+Subject:    Q2 2026 Distribution Plan — Munich, Berlin, Hamburg  [REQ-2026-Q2-0417]
+Priority:   High
+Importance: High
 
 Team,
 
 Please run the Q2 2026 distribution optimization for our Germany DC network.
-Objective: minimize total routing cost in EUR across SKU-001/002/003 shipped from
-warehouses W1 (Hamburg), W2 (Berlin), W3 (Munich) to destinations D1 (Paris),
-D2 (Vienna), D3 (Amsterdam).
+Attached: capacity CSV, routing matrix, demand forecast (Rev. 3), and the
+Munich IG Metall collective agreement. We need the model submitted to
+Quantagonia this morning so I can review with Isabelle before the Q2 kickoff
+at 14:00.
 
-Constraints:
+Objective
+---------
+Minimize total routing cost in EUR across SKU-001 / SKU-002 / SKU-003
+shipped from W1 (Hamburg), W2 (Berlin), W3 (Munich) to D1 (Paris),
+D2 (Vienna), D3 (Amsterdam), over the April – June 2026 horizon.
+
+Constraints
+-----------
   - Monthly warehouse capacities per the attached capacity CSV.
-  - Monthly SKU demand per the attached XLSX (tabs Apr / May / Jun; Summary is informational).
-  - Munich labour rules per the attached IG Metall collective agreement. In particular:
-      * 8h shift cap (§2), weekend overtime prohibited except documented Notfall (§5).
-      * Prefer Munich (W3) for SKU-001 where routing cost is competitive.
+    Note: Munich (W3) is reported in kilograms — see §9 of the IG Metall
+    agreement. Planning, please confirm the normalisation before submit.
+  - Monthly SKU demand per the attached XLSX (tabs Apr / May / Jun;
+    Summary is informational).
+  - Munich labour rules per §1–§10 of the IG Metall agreement. In particular:
+      * §2: 8h shift cap, 48h rolling 4-week weekly cap.
+      * §5: Weekend overtime PROHIBITED (no exceptions this quarter —
+            we have no declared Notfall).
+      * §9: Capacity at Munich DC reported in kg, must convert to tonnes
+            before entering the solver.
+  - Prefer Munich (W3) for SKU-001 where routing cost is competitive —
+    this aligns with the board's decision to rebalance southern European
+    demand through Munich this quarter.
   - All demand must be fully satisfied (no backorders).
 
-Deliverable: optimal shipment plan by warehouse × destination × SKU × month,
-plus total cost and per-warehouse utilization.
+Deliverable
+-----------
+Optimal shipment plan by warehouse × destination × SKU × month, plus
+total cost (EUR) and per-warehouse utilisation (% of monthly capacity).
+Please push the solution summary back into this thread; I want Kleinert's
+team to see the cold start timing against their HybridSolver bench.
 
-— Planner
+No need to copy me on the intermediate extraction previews — the agent's
+Slack posts are fine. Flag only if the validator trips or the solver
+returns anything over 1% gap.
+
+Thanks,
+Stefan
+
+---
+Stefan Krüger
+Plant Director — ACME Munich Distribution Center
+ACME Logistics GmbH
+Hansastraße 42, 80686 München, Deutschland
+T: +49 (0) 89 4441 2030   M: +49 (0) 171 225 8842
+s.krueger@acme-logistics.de
+
+---
+Diese E-Mail und ihre Anhänge können vertrauliche und/oder rechtlich
+geschützte Informationen enthalten. Wenn Sie nicht der richtige Adressat
+sind, informieren Sie bitte sofort den Absender und vernichten Sie diese
+E-Mail. Das unerlaubte Kopieren sowie die unbefugte Weitergabe dieser
+E-Mail sind nicht gestattet.
+
+This e-mail and any attachments may contain confidential and/or privileged
+information. If you are not the intended recipient, please notify the
+sender immediately and delete this e-mail. Unauthorised copying and
+distribution of this e-mail are prohibited.
+
+ACME Logistics GmbH · Sitz München · Handelsregister: HRB 142 889 München
+Geschäftsführung: S. Krüger, I. Weber · USt-IdNr.: DE 247 881 330
